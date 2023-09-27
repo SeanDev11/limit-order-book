@@ -6,6 +6,8 @@ int check(int exp, const char *msg);
 void send_msg(int client_socket, char *buffer, size_t buffer_size, const char *format, ...);
 
 void Server::handle_connection(int client_socket) {
+    //int client_socket = *((int*)p_client_socket);
+    //free(p_client_socket);
     char r_buff[BUFFSIZE];
     char w_buff[BUFFSIZE];
     size_t bytes_read;
@@ -116,7 +118,16 @@ void Server::run() {
               "Accept failed.");
 
         std::cout << "Connected" << std::endl;
-        handle_connection(client_socket);
+        //handle_connection(client_socket);
+        /*pthread_t t;
+        int *pclient = (int*)malloc(sizeof(int));
+        *pclient = client_socket;
+        pthread_create(&t, NULL, , pclient);*/
+
+        std::thread t([this, client_socket]() {
+            this->handle_connection(client_socket);
+        });
+        t.detach();
     }
 
 }

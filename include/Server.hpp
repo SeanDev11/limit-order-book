@@ -9,11 +9,13 @@
 #include <unistd.h>
 #include <string>
 #include <sstream>
+#include <thread>
 
 #define SERVERPORT 8989
 #define BUFFSIZE 4096
 #define SOCKETERROR (-1)
 #define SERVER_BACKLOG 50
+#define THREAD_POOL_SIZE 100
 
 typedef struct sockaddr_in SA_IN;
 typedef struct sockaddr SA;
