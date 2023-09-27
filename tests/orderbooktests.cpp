@@ -3,6 +3,7 @@
 #include "Heap.hpp"
 #include "Limit.hpp"
 #include "Book.hpp"
+#include "BookManager.hpp"
 #include <iostream>
 
 TEST(OrderTests, InstantiateOrder) {
@@ -761,53 +762,128 @@ TEST(MinHeapTests, RemoveLast) {
 
 TEST(OrderPointerTests, SameOrderObject) {
     // Same order object in tree as in map
+    Book book = Book();
+    book.place_order(true, 10, 100);
+    book.place_order(false, 10, 200);
 
+    EXPECT_EQ(book.get_best_bid_limit()->head_order, book.orders[0]);
+    EXPECT_EQ(book.get_best_ask_limit()->head_order, book.orders[1]);
+}
 
+TEST(LimitPointerTests, SameLimitObject) {
+    // Same limit object in tree as in map
+    Book book = Book();
+    book.place_order(true, 10, 100);
+    book.place_order(false, 10, 200);
+
+    EXPECT_EQ(book.get_best_bid_limit(), book.orders[0]->parent_limit);
+    EXPECT_EQ(book.get_best_ask_limit(), book.orders[1]->parent_limit);
 }
 
 TEST(BookTests, Basic1) {
     Book *book = new Book();
-    book->placeOrder(true, 10, 100, 5);
-    EXPECT_EQ(book->getVolumeAtLimit(100), 10);
+    book->place_order(true, 10, 100);
+    EXPECT_EQ(book->get_volume_at_limit(100), 10);
 }
 
 TEST(BookTests, Basic2) {
     Book *book = new Book();
     // Buy:
     // 10 @ 100
-    book->placeOrder(true, 10, 100, 5);
-    EXPECT_EQ(book->getVolumeAtLimit(100), 10);
+    book->place_order(true, 10, 100);
+    EXPECT_EQ(book->get_volume_at_limit(100), 10);
     // Buy:
     // 10 @ 100
     // 5 @ 101
-    book->placeOrder(true, 5, 101, 5);
+    book->place_order(true, 5, 101);
     // Buy:
     // 10 @ 100
     // 5 @ 101
     // 10 @ 100
-    book->placeOrder(true, 10, 100, 5);
+    book->place_order(true, 10, 100);
     // Sell:
     // 10 @ 110
-    book->placeOrder(false, 10, 110, 5);
+    book->place_order(false, 10, 110);
     // Buy:
     // 10 @ 100
     // 5 @ 101
     // 10 @ 100
     // Sell:
     // 5 @ 110
-    book->placeOrder(true, 5, 110, 5);
+    book->place_order(true, 5, 110);
     // Sell:
     // 5 @ 110
     // 5 @ 120
-    book->placeOrder(false, 5, 120, 5);
+    book->place_order(false, 5, 120);
     // Sell:
     // 5 @ 110
     // 5 @ 120
-    book->placeOrder(false, 100, 25, 5);
+    book->place_order(false, 100, 25);
 }
 
-TEST(BookTests, Basic3) {
-    Book *book = new Book();
+TEST(BookTests, BestBidAskOnExecute) {
+    Book book = Book();
+    EXPECT_EQ(book.get_best_ask(), -1);
+    EXPECT_EQ(book.get_best_bid(), -1);
+    book.place_order(true, 10, 100);
+    EXPECT_EQ(book.get_best_ask(), -1);
+    EXPECT_EQ(book.get_best_bid(), 100);
+    book.place_order(false, 20, 90);
+    EXPECT_EQ(book.get_best_ask(), 90);
+    EXPECT_EQ(book.get_best_bid(), -1);
 }
 
-// Test both removals..through the book? yup
+TEST(BookTests, BestBidAskOnCancel) {
+    Book book = Book();
+    book.place_order(true, 10, 100);
+    book.place_order(false, 20, 110);
+    EXPECT_EQ(book.get_best_ask(), 110);
+    EXPECT_EQ(book.get_best_bid(), 100);
+    book.cancel_order(0);
+    EXPECT_EQ(book.get_best_ask(), 110);
+    EXPECT_EQ(book.get_best_bid(), -1);
+    book.cancel_order(1);
+    EXPECT_EQ(book.get_best_ask(), -1);
+    EXPECT_EQ(book.get_best_bid(), -1);
+    book.place_order(true, 10, 90);
+    EXPECT_EQ(book.get_best_ask(), -1);
+    EXPECT_EQ(book.get_best_bid(), 90);
+}
+
+TEST(BookManagerTests, Basic) {
+    BookManager manager = BookManager();
+    manager.place_order(true, 10, 200, 1);
+    manager.place_order(true, 20, 100, 2);
+    manager.place_order(true, 10, 100, 1);
+
+    EXPECT_EQ(manager.get_num_open_orders(1), 2);
+    EXPECT_EQ(manager.get_num_open_orders(2), 1);
+
+    manager.place_order(false, 10, 190, 1);
+    EXPECT_EQ(manager.get_num_open_orders(1), 1);
+    EXPECT_EQ(manager.get_volume_at_limit(200, 1), 0);
+    EXPECT_EQ(manager.get_volume_at_limit(100, 2), 20);
+    EXPECT_EQ(manager.get_volume_at_limit(100, 1), 10);
+
+    manager.cancel_order(1, 1);
+    EXPECT_EQ(manager.get_num_open_orders(1), 0);
+
+    manager.place_order(false, 20, 100, 2);
+    EXPECT_EQ(manager.get_num_open_orders(2), 0);
+}
+
+// Test both removals. Through the book? yup
+
+// Write test/tests with full execution of multiple securities
+// and executions/cancellations for BookManager
+// Then socket it.
+// Lock the books for writing
+// BookManager should be able to simultaneously execute orders
+// in different books EXTENSION
+// Main thing to safeguard against is two orders on same book
+// getting inconsistent states, One after the other
+// LOCK BOOK for executing/place_order/cancel_order/writing
+
+// Create executable for server & for client
+// Server just needs to send stuff
+// Cliwnt needs all the files

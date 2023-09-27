@@ -4,8 +4,8 @@ void Limit::add_order(Order *order) {
     if (size == 0) {
         head_order = order;
     } else {
-        tail_order->nextOrder = order;
-        order->prevOrder = tail_order;
+        tail_order->next_order = order;
+        order->prev_order = tail_order;
         tail_order = order;
     }
 
@@ -24,7 +24,7 @@ Limit::~Limit() {
     Order *curr = head_order;
     Order *next;
     while (curr && curr != tail_order) {
-        next = head_order->nextOrder;
+        next = head_order->next_order;
         // Calls order destructor
         delete curr;
         curr = next;

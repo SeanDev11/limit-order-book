@@ -1,8 +1,11 @@
 #include <iostream>
-#include "Order.hpp"
-#include "Book.hpp"
+#include "Server.hpp"
+
 
 int main() {
-    std::cout << "Running Orderbook..." << std::endl;
+    // Server.run()
+    Server server = Server();
+    server.run();
+
     return 0;
 }

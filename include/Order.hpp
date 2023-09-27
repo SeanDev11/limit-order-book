@@ -8,23 +8,23 @@ class Limit;
 class Order {
 
 public:
-    Order(int id, bool isBuySide, int volume, int limit);
+    Order(int id, bool is_buy_side, int volume, int limit);
     int id;
-    int securityId;
-    bool isBuySide;
+    int security_id;
+    bool is_buy_side;
     int volume;
-    int limitPrice;
-    int entryTime;
-    int eventTime;
-    Order *nextOrder;
-    Order *prevOrder;
-    Limit *parentLimit; // associated limit object
+    int limit_price;
+    int entry_time;
+    int event_time;
+    Order *next_order;
+    Order *prev_order;
+    Limit *parent_limit; // associated limit object
     // Add initial volume / executed volume
 
     ~Order() {
-        nextOrder = nullptr;
-        prevOrder = nullptr;
-        parentLimit = nullptr;
+        next_order = nullptr;
+        prev_order = nullptr;
+        parent_limit = nullptr;
     }
 };
 

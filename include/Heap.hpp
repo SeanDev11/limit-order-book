@@ -209,8 +209,6 @@ class Heap {
             }
             swap(limits[i], limits[max_idx]);
             i = max_idx;
-            std::cout << limits[0] << std::endl;
-
         }
     }
 
