@@ -64,7 +64,7 @@ Furthermore, due to implementation details such as storing the best bid & ask in
 ## Future Additions
 
 1) Implement market orders (not just limit orders)
-2) Support level 3/4 market date (viewing of order book depth)
+2) Support level 3/4 market data (viewing of order book depth)
 3) Notify clients on execution of their order when a counterparty is found
 4) Allow clients to stream market information live (This could be used to create a stock price chart)
 5) Continually refactor to improve the speed of the code, making use of low-latency C++ techniques.
