@@ -60,3 +60,11 @@ This command will close the connection with the server and end the client progra
 The server that uses the LOB to create a miniature "securities market/exchange" is multithreaded, so different clients can execute their orders at the same time (given that they are buying/selling different securities).
 
 Furthermore, due to implementation details such as storing the best bid & ask in a separate variable (as opposed to always reading it from the root of the heap), and the use of mutexes, this program supports simultaneous reading and writing. So even if we are in the worst-case scenario of a buy/sell/cancel taking **O(log n)** time, other clients can still perform the read operations at the same time without having to wait.
+
+## Future Additions
+
+1) Implement market orders (not just limit orders)
+2) Support level 3/4 market date (viewing of order book depth)
+3) Notify clients on execution of their order when a counterparty is found
+4) Allow clients to stream market information live (This could be used to create a stock price chart)
+5) Continually refactor to improve the speed of the code, making use of low-latency C++ techniques.
